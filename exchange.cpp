@@ -5,18 +5,13 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
-#include <map>
-#include <set>
 #include <chrono>
 #include <queue>
 
 struct order {
-  int64_t order_id;
+    int64_t order_id, quantity, time;
 	long double price;
-	int64_t quantity;
-    int64_t time;
 	bool buy; //0=buy,1=sell
-	//bool matched;
     order();
        bool operator<( order &other) {
         if (price != other.price) {
@@ -27,50 +22,37 @@ struct order {
     }
 };
 
-
 order parse(std::shared_ptr<char[]> buffer) {
 	std::istringstream stream(buffer.get());
 	order ord;
 	stream >> ord.order_id >> ord.buy >> ord.price >> ord.quantity;
-	//ord.matched = false;
      ord.time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 	return ord;
 }
 
-int64_t ask_price,ask_quantity,bid_price,bid_quantity;
-//ask price-> highest seller acceptence price
 std::priority_queue<order> BUY,SELL;
 
 void add_to_priority_queue(const order& ord) {
-	 //take the order, add it to the necessary priority queue
-       if (ord.buy) {
-              BUY.push(ord);
-            if (ord.price >= ask_price) {
-                match();
-                return;
-            }
-
+    if ((ord.buy && ord.price >= SELL.top().price) || (!ord.buy && ord.price <= BUY.top().price)) {
+        if (ord.buy) {
+            BUY.push(ord);
         } else {
-              SELL.push(ord);
-            if (ord.price <= bid_price) {
-                match();
-                return;
-            }
+            SELL.push(ord);
         }
-
+        match();
+    }
 }
+
 order& buy_top = const_cast<order&>(BUY.top());
-        order& sell_top = const_cast<order&>(SELL.top());
+ order& sell_top = const_cast<order&>(SELL.top());
 
 void match() {
-	// match the orders
-
 while(BUY.size()>0 && SELL.size()>0){
 
  buy_top = const_cast<order&>(BUY.top());
   sell_top = const_cast<order&>(SELL.top());
 
-          if(buy_top.price < sell_top.price){break;}
+    if(buy_top.price < sell_top.price){break;}
 
         if(buy_top.quantity > sell_top.quantity){
               display(0,sell_top.quantity);
@@ -83,12 +65,12 @@ while(BUY.size()>0 && SELL.size()>0){
             sell_top.quantity-=buy_top.quantity;
         }
         else {  
-            display(2,sell_top.quantity);
+            display(2,0);
             BUY.pop(); SELL.pop();
 
         }
-
-
+    
+    
 }
 
 }
@@ -108,6 +90,3 @@ void display(int x, long long q){
              if(x==1)q2=q;
              std::cout<<" Quantity Sold: "<<q<<" at Price:"<<sell_top.price;
 }
-
-
-
