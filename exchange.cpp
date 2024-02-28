@@ -83,7 +83,7 @@ while(BUY.size()>0 && SELL.size()>0){
             sell_top.quantity-=buy_top.quantity;
         }
         else {  
-            display(2,0);
+            display(2,sell_top.quantity);
             BUY.pop(); SELL.pop();
 
         }
