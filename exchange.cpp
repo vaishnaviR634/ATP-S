@@ -37,7 +37,7 @@ order parse(std::shared_ptr<char[]> buffer) {
 	order ord;
 	stream >> ord.order_id >> ord.buy >> ord.price >> ord.quantity;
 	ord.matched = false;
-    ord.time=0; //add time
+     ord.time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 	return ord;
 }
 
