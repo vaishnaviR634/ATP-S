@@ -108,3 +108,6 @@ void display(int x, long long q){
              if(x==1)q2=q;
              std::cout<<" Quantity Sold: "<<q<<" at Price:"<<sell_top.price;
 }
+
+
+
